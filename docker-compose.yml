@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  app:
+    container_name: app
+    build: .
+    ports:
+      - 5000:5000
+    depends_on:
+      - db
+    networks:
+      - db_net
+      
+  db:
+    container_name: db
+    image: postgres:13-alpine
+    build:
+      context: .
+      dockerfile: Dockerfile-Db
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: geocoding
+    ports:
+      - 5432:5432
+    volumes:
+      - database_data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - db_net
+
+volumes:
+  database_data:
+
+networks:
+  db_net:
+    name: db_net
